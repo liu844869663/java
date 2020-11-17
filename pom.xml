@@ -11,6 +11,7 @@
     <modules>
         <module>jdbc</module>
         <module>basic</module>
+        <module>mybatis-spring</module>
     </modules>
 
     <dependencies>

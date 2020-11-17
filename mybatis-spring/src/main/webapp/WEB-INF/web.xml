@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!-- Spring 和 MyBatis 的配置文件 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring-mybatis.xml</param-value>
+    </context-param>
+
+    <!-- 编码过滤器，Spring 提供了 CharacterEncodingFilter 过滤器
+         这个过滤器就是针对于每次浏览器请求进行过滤的，然后再其之上添加了父类没有的功能即处理字符编码 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <async-supported>true</async-supported>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 在容器（Tomcat、Jetty）启动时会被 ContextLoaderListener 监听到，从而调用其 contextInitialized() 方法，初始化 Root WebApplicationContext 容器 -->
+    <!-- 声明 Spring Web 容器监听器 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!-- 防止 Spring 内存溢出监听器 -->
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+
+    <!-- 1.SpringMVC 配置 前置控制器（SpringMVC 的入口）
+         DispatcherServlet 是一个 Servlet，所以可以配置多个 DispatcherServlet -->
+    <servlet>
+        <!-- 在 DispatcherServlet 的初始化过程中，框架会在 web 应用 的 WEB-INF 文件夹下，
+             寻找名为 [servlet-name]-servlet.xml 的配置文件，生成文件中定义的 Bean. -->
+        <servlet-name>SpringMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 配置需要加载的配置文件 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-mvc.xml</param-value>
+        </init-param>
+        <!-- 程序运行时从 web.xml 开始，加载顺序为：context-param -> Listener -> Filter -> Structs -> Servlet
+             设置 web.xml 文件启动时加载的顺序(1 代表容器启动时首先初始化该 Servlet，让这个 Servlet 随 Servlet 容器一起启动)
+             load-on-startup 是指这个 Servlet 是在当前 web 应用被加载的时候就被创建，而不是第一次被请求的时候被创建  -->
+        <load-on-startup>1</load-on-startup>
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <!-- 这个 Servlet 的名字是 SpringMVC，可以有多个 DispatcherServlet，是通过名字来区分的
+             每一个 DispatcherServlet 有自己的 WebApplicationContext 上下文对象，同时保存在 ServletContext 中和 Request 对象中
+             ApplicationContext（Spring 容器）是 Spring 的核心
+             Context 我们通常解释为上下文环境，Spring 把 Bean 放在这个容器中，在需要的时候，可以 getBean 方法取出-->
+        <servlet-name>SpringMVC</servlet-name>
+        <!-- Servlet 拦截匹配规则，可选配置：*.do、*.action、*.html、/、/xxx/* ，不允许:/* -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+
+    <welcome-file-list>
+        <!-- 浏览器输入到项目名，默认打开如下配置页面 -->
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>

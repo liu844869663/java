@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/tx
+                        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+                        http://www.springframework.org/schema/aop
+                        https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!-- 定义一个数据源 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="close">
+        <property name="url" value="jdbc:mysql://192.250.110.158:3306/gsfy_user?useUnicode=true&amp;characterEncoding=utf8"/>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="username" value="root"/>
+        <property name="password" value="admin@951753"/>
+        <property name="filters" value="stat,log4j"/>
+        <!-- 最大连接池数量 -->
+        <property name="maxActive" value="20"/>
+        <property name="minIdle" value="20"/>
+        <!-- 初始化时建立物理连接的个数 -->
+        <property name="initialSize" value="5"/>
+        <!-- 获取连接时最大等待时间 -->
+        <property name="maxWait" value="10000"/>
+        <!-- 在指定时间间隔内执行一次空闲连接回收器 -->
+        <property name="timeBetweenEvictionRunsMillis" value="3600000"/>
+        <!-- 池中的连接空闲指定时间后被回收 -->
+        <property name="minEvictableIdleTimeMillis" value="120000"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="connectionErrorRetryAttempts" value="30"/>
+        <property name="breakAfterAcquireFailure" value="true"/>
+    </bean>
+
+    <!-- Spring 和 MyBatis 整合 -->
+    <bean id="mySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 引入 MyBatis 配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!-- 自动扫描 XML 映射文件 -->
+        <property name="mapperLocations" value="classpath:tk/mybatis/simple/mapper/*.xml"/>
+    </bean>
+
+    <!-- 通过 MapperScannerConfigurer 类自动扫描 Mapper 接口 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- Mapper 接口所在包路径 -->
+        <property name="basePackage" value="tk.mybatis.simple.mapper"/>
+        <!--引用上面的 SqlSessionFactoryBean 对象 -->
+        <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory"/>
+    </bean>
+
+    <!-- 事务管理器 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 指定数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 设置为上面定义事务管理器，默认值为 transactionManager -->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <!-- 配置事务传播特性  -->
+    <tx:advice id="transactionAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="insert*" rollback-for="java.lang.Exception"/>
+            <tx:method name="delete*" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" rollback-for="java.lang.Exception"/>
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--  配置哪些类的哪些方法参与事务 -->
+    <aop:config>
+        <aop:advisor advice-ref="transactionAdvice" pointcut="execution(* tk.mybatis.*.service..*Service*.*(..))"/>
+    </aop:config>
+    <aop:aspectj-autoproxy/>
+
+</beans>

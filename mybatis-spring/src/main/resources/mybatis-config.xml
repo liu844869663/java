@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- plugins在配置文件中的位置必须符合要求，否则会报错，顺序如下: properties, settings, typeAliases, plugins,
+			objectFactory, objectWrapperFactory, reflectorFactory, environments, databaseIdProvider, typeHandlers, mappers -->
+	<!-- 配置mybatis的缓存，延迟加载等等一系列属性 -->
+	<settings>
+		<!-- 全局的开启或关闭配置文件中的所有映射器已经配置的任何缓存，关闭二级缓存，默认开启 -->
+		<setting name="cacheEnabled" value="false" />
+		<!-- 开启一级缓存，缓存级别为SESSION（默认），如果缓存级别为STATEMENT将不会再同一个SqlSession中缓存 -->
+		<setting name="localCacheScope" value="STATEMENT" />
+		<!-- 通过resultMap标签内的association标签可使用延迟加载 -->
+		<!-- 查询时，关闭关联对象即时加载以提高性能，开启延迟加载，默认关闭，关闭表示直接加载，查询时就进行关联查询 -->
+		<setting name="lazyLoadingEnabled" value="true" />
+		<!-- 设置关联对象加载的形态，关闭侵入式延迟加载，在访问主对象时不进行查询关联对象，而是在真正访问关联对象时才进行关联查询，以提高性能 -->
+		<!-- 3.4.1及之前的版本默认为开启，表示查询时不进行关联查询，访问主对象时才进行关联查询 -->
+		<setting name="aggressiveLazyLoading" value="false" />
+		<!-- 允许使用列标签代替列名 -->
+		<setting name="useColumnLabel" value="true" />
+		<!-- 不允许使用自定义的主键值(比如由程序生成的UUID 32位编码作为键值)，数据表的PK生成策略将被覆盖 -->
+		<setting name="useGeneratedKeys" value="false" />
+		<!-- 是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名A_COLUMN到经典Java属性名aColumn的类似映射 -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+	<!-- 指定路径下的实体类支持别名（默认实体类的名称 全小写）， @Alias 注解可设置别名 -->
+	<typeAliases>
+		<package name="tk.mybatis.simple.model" />
+	</typeAliases>
+	<plugins>
+		<!-- PageHelper 分页插件，配置参考：https://github.com/pagehelper/Mybatis-PageHelper -->
+		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+			<!-- 使用哪种方言的分页方式，默认会检测数据库连接，自动选择合适的分页方式 -->
+			<property name="helperDialect" value="mysql"/>
+			<!-- 默认值为 false，该参数对使用 RowBounds 作为分页参数时有效。
+			当该参数设置为 true 时，会将 RowBounds 中的 offset 参数当成 pageNum 使用，可以用页码和页面大小两个参数进行分页 -->
+			<property name="offsetAsPageNum" value="true" />
+			<!-- 默认值为false，该参数对使用 RowBounds 作为分页参数时有效。
+			当该参数设置为true时，使用 RowBounds 分页会进行 count 查询 -->
+			<property name="rowBoundsWithCount" value="true" />
+			<!-- 默认值为 false，当该参数设置为 true 时，
+			如果 pageSize=0 或者 RowBounds.limit = 0 就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 Page 类型）-->
+			<property name="pageSizeZero" value="true" />
+		</plugin>
+	</plugins>
+</configuration>

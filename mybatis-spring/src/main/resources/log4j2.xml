@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="INFO" monitorInterval="30">
+    <appenders>
+        <!-- 参考官方地址：https://logging.apache.org/log4j/2.x/ -->
+        <!-- 这个输出控制台的配置  -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 设置输出日志级别（高于 level），匹配才打印 -->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!-- 打印日志的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n"/>
+        </Console>
+        <!-- 定义一个日志输入文件 RollingFile，按天或者超过 100M 分割会进行分割 -->
+        <RollingFile name="RollingFile" fileName="logs/trace.log"
+                     append="true" filePattern="logs/$${date:yyyy-MM}/trace-%d{yyyy-MM-dd}-%i.log.gz">
+            <!-- 需要接收的日志的级别（高于 level） -->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+			<!-- 日志的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+        </RollingFile>
+		<!-- 定义一个日志输入文件 RollingErrorFile，按天或者超过 100M 分割会进行分割 -->
+        <RollingFile name="RollingErrorFile" fileName="logs/error.log"
+                     append="true" filePattern="logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz">
+			<!-- 需要接收的日志的级别（高于 level） -->
+            <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+			<!-- 日志的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+        </RollingFile>
+    </appenders>
+    <loggers>
+        <!--过滤掉 Spring 和 Mybatis 的一些无用的 DEBUG 信息 -->
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.mybatis" level="WARN"/>
+        <root level="INFO" includeLocation="true">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="RollingErrorFile"/>
+        </root>
+    </loggers>
+</configuration>
