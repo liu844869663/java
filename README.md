@@ -10,6 +10,8 @@
 
 > --- jdbc（java database connection）
 
+> --- mybatis-spring（ssm模板）
+
 **`项目说明`** 
 
 1. 其中包名的最后一层文件夹名称大致表示记录笔记的所属类别
