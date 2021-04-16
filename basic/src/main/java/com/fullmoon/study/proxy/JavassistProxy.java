@@ -24,6 +24,7 @@ public class JavassistProxy {
             // 拦截 `say` 方法
             return "say".equals(method.getName());
         });
+        factory.getClass().getDeclaredField("writeDirectory").set(factory, ".");
         JavassistProxy proxy = (JavassistProxy) factory.create(new Class<?>[]{}, new Object[]{}, (o, method, method1, objects) -> {
             System.out.println("前置处理");
             Object result = method1.invoke(o, objects);

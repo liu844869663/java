@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 public class JavassistTest {
 
     public static void main(String[] args) throws Exception {
-        // 获取默认的 ClassPool 对象
+        // 获取默认的单例 ClassPool 对象
         ClassPool cp = ClassPool.getDefault();
         // 使用 ClassPool 生成指定名称的 CtClass 对象，用于创建 Class 对象
         CtClass clazz = cp.makeClass("com.study.proxy.Person");
@@ -48,9 +48,9 @@ public class JavassistTest {
         // 将方法添加到 CtClass 对象中
         clazz.addMethod(ctMethod);
         // 设置 .class 文件的保存路径
-        clazz.writeFile("D:\\workspaces\\idea\\study-java");
+        clazz.writeFile(".");
 
-        // 通过 CtClass 对象创建一个 Class 对象
+        // 通过 CtClass 对象创建一个 Class 对象，无法继续修改 Class 对象
         Class<?> c = clazz.toClass();
         // 创建一个实例对象
         Object obj = c.newInstance();
